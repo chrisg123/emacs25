@@ -1,0 +1,48 @@
+#!/bin/sh
+
+main() {
+    TARBALL="emacs-25.1.tar.gz"
+    SRC=$(echo "$TARBALL" | sed 's/.tar.gz//')
+    URL="https://ftp.gnu.org/gnu/emacs/$TARBALL"
+    DLDIR="~/Downloads/"
+    
+    if ! isroot; then
+	printf "script must be run as root\n"
+    fi
+
+    get_build_tools
+    
+    mkdir -p "$DLDIR"
+
+    if [ ! -f "$DLDIR$TARBALL" ]; then
+	wget "$URL" -P "DLDIR"
+    fi
+    
+    if [ -f "$DLDIR$TARBALL" ] && [ ! -f "$DLDIR$SRC"]; then
+	tar xvf "$DLDIR$TARBALL" -C "$DLDIR"
+    fi
+    
+    if [ -f "$SRC" ]; then
+	cd "$DLDIR$SRC"
+	./configure
+	make
+	checkinstall
+    fi
+    
+    return 0
+}
+
+isroot() {
+    if [ "$EUID" -eq 0 ]; then	
+	return 0
+    fi
+    return 1
+}
+
+get_build_tools(){
+    apt install build-essential checkinstall
+    apt-get build-dep emacs24
+    return 0
+}
+
+main
