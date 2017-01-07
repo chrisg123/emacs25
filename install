@@ -8,6 +8,7 @@ main() {
     
     if ! isroot; then
 	printf "script must be run as root\n"
+	exit 1
     fi
 
     get_build_tools
